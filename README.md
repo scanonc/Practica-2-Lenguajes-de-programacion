@@ -20,5 +20,7 @@ Parte 3: generación de reportes con su suma total.
 Parte 4: casos de prueba que demuestran el correcto funcionamiento del programa.
 
 INTEGRANTES: Sebastian Cañon Cuartas
-LINK DEL VIDEO:
+
+LINK DEL VIDEO: https://youtu.be/G-84l_KyXAE
+
 PLATAFORMAS USADAS: SWI-prolog
