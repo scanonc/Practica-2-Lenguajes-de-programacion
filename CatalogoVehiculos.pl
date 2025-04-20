@@ -1,7 +1,7 @@
 % PARTE 1
 
 % Lista de vehiculos
-% vehiculo(Marca, Modelo, Tipo, Precio, Año)
+% vehiculo(Marca, Modelo, Tipo, Precio, Aï¿½o)
 
 vehiculo(toyota, corolla, sedan, 22000, 2022).
 vehiculo(toyota, rav4, suv, 28000, 2023).
@@ -48,29 +48,47 @@ filtrar_marca(Marca, Vehiculos) :-
 
 % PARTE 3
 
-generar_reporte(Marca, Tipo, Presupuesto, Resultado) :-
-    findall(Modelo, (vehiculo(Marca, Modelo, Tipo, Precio, _), Precio =< Presupuesto), ListaVehiculos),
-    valor_total(ListaVehiculos, ValorTotal),
-    Limite is 1000000,
-    ValorTotal =< Limite,
-    Resultado = (ListaVehiculos, ValorTotal).
+% Extraer los pares (Precio, Modelo) filtrados
+pares_filtrados(Marca, Tipo, Presupuesto, Pares) :-
+    findall((Precio, Modelo),( vehiculo(Marca, Modelo, Tipo, Precio,_),Precio =< Presupuesto),Pares).
 
-valor_total(ListaVehiculos, Total) :-
-    findall(Precio, (member(Modelo, ListaVehiculos), vehiculo(_, Modelo, _, Precio, _)), Precios),
+% Ordenar los pares de menor a mayor
+ordenar_por_precio(Pares, ParesOrd) :-
+    sort(1, @=<, Pares, ParesOrd).
+
+% Extraer solo el modelo de los pares
+extraer_modelos([], []).
+extraer_modelos([(_,Modelo)|Resto], [Modelo|Ms]) :-
+extraer_modelos(Resto, Ms).
+
+valor_total(ModelosOrd, Total) :-
+    findall(Precio, (member(Modelo, ModelosOrd), vehiculo(_, Modelo, _, Precio, _)), Precios),
     sumlist(Precios, Total).
 
+
+% generar el reporte
+generar_reporte(Marca, Tipo, Presupuesto, (ModelosOrd, Total)) :-
+    pares_filtrados(Marca, Tipo, Presupuesto, Pares),
+    ordenar_por_precio(Pares, ParesOrd),
+    extraer_modelos(ParesOrd, ModelosOrd),
+    valor_total(ModelosOrd, Total).
 
 % PARTE 4
 
 % casos de prueba
+
+% Case 1: List all Toyota SUV references priced under $30,000.
 caso_1 :-
     findall(Modelo, (vehiculo(toyota, Modelo, suv, Precio, _), Precio < 30000), Resultado),
     write(Resultado).
 
+% Case 2: Show Ford brand vehicles using bagof/3, grouped by type and year.
 caso_2 :-
-    bagof((Modelo, Tipo, Año), vehiculo(ford, Modelo, Tipo, _, Año), Resultado),
+    bagof((Modelo, Tipo, Aï¿½o), vehiculo(ford, Modelo, Tipo, _, Aï¿½o), Resultado),
     write(Resultado).
 
+% Case 3: Calculate the total value of an inventory filtere by type
+% sedan without exceeding 500000
 caso_3 :-
     findall(Modelo, (vehiculo(_, Modelo, sedan, Precio, _), Precio =< 500000), Lista),
     valor_total(Lista, Total),
